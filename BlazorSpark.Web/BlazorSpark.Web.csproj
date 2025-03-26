@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BlazorDatasheet" Version="0.7.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\BlazorSpark.ServiceDefaults\BlazorSpark.ServiceDefaults.csproj" />
   </ItemGroup>
 

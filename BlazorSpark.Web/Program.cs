@@ -1,3 +1,4 @@
+using BlazorDatasheet.Extensions;
 using BlazorSpark.Web;
 using BlazorSpark.Web.Components;
 
@@ -11,6 +12,8 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddOutputCache();
+
+builder.Services.AddBlazorDatasheet();
 
 var app = builder.Build();
 
