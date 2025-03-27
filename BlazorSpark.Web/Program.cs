@@ -7,6 +7,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
 
+// Add Azure Queue client.
+builder.AddAzureQueueClient("queues");
+
+// Create QueueService
+builder.Services.AddScoped<QueueService>();
+
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
