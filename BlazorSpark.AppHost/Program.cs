@@ -1,25 +1,31 @@
-using Aspire.Hosting;
+﻿using Aspire.Hosting;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-// Enable Storage and Queue services.
-var queues = builder.AddAzureStorage("storage")
-    .RunAsEmulator()
-    .AddQueues("queues");
+// Add queues
+var storage = builder.AddAzureStorage("storage")
+                     .RunAsEmulator()
+                     .AddQueues("queues");
+// Add blobs
+var blobStorage = builder.AddAzureStorage("blobStorage")
+                         .RunAsEmulator()
+                         .AddBlobs("blobs");
 
-// Add the web frontend project.
+// Add the web frontend — reference the same storage for both queue + blob access
 builder.AddProject<Projects.BlazorSpark_Web>("webfrontend")
-    .WithReference(queues)
-    .WithExternalHttpEndpoints();
+       .WithReference(storage)
+       .WithReference(blobStorage)
+       .WithExternalHttpEndpoints();
 
-// Add the first instance of the web container.
+// Add both UI‑container instances, referencing the same storage
 builder.AddProject<Projects.BlazorUIContainer>("webcontainer1")
-       .WithReference(queues)
+       .WithReference(storage)
+       .WithReference(blobStorage)
        .WithHttpsEndpoint(name: "webcontainer1-http", isProxied: true);
 
-// Add the second instance of the web container.
 builder.AddProject<Projects.BlazorUIContainer>("webcontainer2")
-       .WithReference(queues)
+       .WithReference(storage)
+       .WithReference(blobStorage)
        .WithHttpsEndpoint(name: "webcontainer2-http", isProxied: true);
 
 builder.Build().Run();

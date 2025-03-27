@@ -1,5 +1,8 @@
 using BlazorDatasheet.Extensions;
 using BlazorUIContainer.Components;
+using Azure.Storage.Queues;
+using Azure.Storage.Blobs;
+using Microsoft.Extensions.Hosting;
 
 namespace BlazorUIContainer
 {
@@ -12,11 +15,16 @@ namespace BlazorUIContainer
             // Add service defaults & Aspire client integrations.
             builder.AddServiceDefaults();
 
-            // Add Azure Queue client.
+            // Add Azure Queue & Blob clients.
             builder.AddAzureQueueClient("queues");
+            builder.AddAzureBlobClient("blobs");
 
-            // Create QueueService
-            builder.Services.AddScoped<QueueService>();
+            // Create StorageService
+            builder.Services.AddScoped<StorageService>();
+
+            // Add WorkState (singleton) and background polling
+            builder.Services.AddSingleton<WorkState>();
+            builder.Services.AddHostedService<QueuePollingService>();
 
             // Add services to the container.
             builder.Services.AddRazorComponents()
@@ -26,18 +34,14 @@ namespace BlazorUIContainer
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
             app.UseHttpsRedirection();
-
             app.UseAntiforgery();
-
             app.MapStaticAssets();
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();

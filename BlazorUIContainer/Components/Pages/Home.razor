@@ -2,59 +2,72 @@
 @using BlazorDatasheet
 @using BlazorDatasheet.Core
 @using BlazorDatasheet.Core.Data
-@using Microsoft.AspNetCore.WebUtilities
-@inject QueueService QueueService
-<Datasheet Sheet="sheet" />
+
+@inject NavigationManager NavigationManager
+@inject StorageService StorageService
+@inject WorkState WorkState
+
+<h3>Latest Queue Message</h3>
+
+@if (string.IsNullOrEmpty(WorkState.CurrentMessage))
+{
+    <p>No message received yet.</p>
+}
+else
+{
+    <p>@WorkState.CurrentMessage</p>
+}
+
+@if (sheet is not null)
+{
+    <Datasheet Sheet="sheet" />
+}
+
 @code {
     [Parameter]
     public Guid? requestGuid { get; set; }
 
+    private const string BlobContainer = "current-container";
+    private const string AvailableQueueName = "available-queue";
     private Sheet sheet;
-    private string QueueMessage = "";
-    private string CurrentGUID = "";
 
     protected override async Task OnInitializedAsync()
     {
-        if (requestGuid != null)
+        var CurrentGuid = WorkState.CurrentMessage;
+
+        if (CurrentGuid != null)
         {
-            if (requestGuid.ToString() == CurrentGUID)
+            // Read existing blob (if needed)
+            var existing = await StorageService.ReadBlobAsync(BlobContainer, CurrentGuid);
+
+            // Upload current URL as the “response”
+            await StorageService.UploadBlobAsync(BlobContainer, CurrentGuid, NavigationManager.Uri);
+
+            // Notify queue that this GUID is now available
+            await StorageService.SendQueueMessageAsync(AvailableQueueName, CurrentGuid);
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (!requestGuid.HasValue)
+            return;
+
+        var ParamGuidString = requestGuid.Value.ToString();
+
+        var CurrentGuid = WorkState.CurrentMessage;
+
+        if (CurrentGuid != null)
+        {
+            if (CurrentGuid == ParamGuidString)
             {
-                await LoadDataSheet();
+                LoadDataSheet();
+                return;
             }
         }
-        else
-        {
-            await LookForWork();
-        }
     }
 
-    private async Task LookForWork()
-    {
-        // Start a loop where we will read the queue every 5 seconds
-        while (true)
-        {
-            QueueMessage = await QueueService.ReadMessageAsync("request-queue");
-
-            if (QueueMessage != null)
-            {
-                await MakeContainerAvalable();
-                break;
-            }
-
-            await Task.Delay(5000);
-        }
-    }
-
-    private async Task MakeContainerAvalable()
-    {
-        // Create a new GUID
-        CurrentGUID = Guid.NewGuid().ToString();
-
-        // Send the GUID to the available queue
-        await QueueService.SendMessageAsync("available-queue", CurrentGUID);
-    }
-
-    private async Task LoadDataSheet()
+    private void LoadDataSheet()
     {
         sheet = new Sheet(3, 3);
     }
