@@ -3,17 +3,7 @@
 @using BlazorDatasheet.Core
 @using BlazorDatasheet.Core.Data
 @inject QueueService QueueService
-
-<PageTitle>Home Container</PageTitle>
-
 <Datasheet Sheet="sheet" />
-<p><b>Queue message:</b> @QueueMessage</p>
-
-<button class="btn btn-primary" @onclick="WriteQueueService">Write To Queue</button>
-
-<button class="btn btn-primary" @onclick="PeekQueueService">Peek Queue</button>
-
-<button class="btn btn-primary" @onclick="ReadQueueService">Read Queue</button>
 @code {
 
     private Sheet sheet;

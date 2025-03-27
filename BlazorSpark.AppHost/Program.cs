@@ -14,12 +14,12 @@ builder.AddProject<Projects.BlazorSpark_Web>("webfrontend")
 
 // Add the first instance of the web container.
 builder.AddProject<Projects.BlazorUIContainer>("webcontainer1")
-    .WithReference(queues)
-    .WithHttpsEndpoint(port: 5001, name: "webcontainer1-http");
+       .WithReference(queues)
+       .WithHttpsEndpoint(name: "webcontainer1-http", isProxied: true);
 
 // Add the second instance of the web container.
 builder.AddProject<Projects.BlazorUIContainer>("webcontainer2")
-    .WithReference(queues)
-    .WithHttpsEndpoint(port: 5002, name: "webcontainer2-http");
+       .WithReference(queues)
+       .WithHttpsEndpoint(name: "webcontainer2-http", isProxied: true);
 
 builder.Build().Run();
