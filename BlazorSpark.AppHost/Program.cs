@@ -8,6 +8,10 @@ var queues = builder.AddAzureStorage("storage")
 
 builder.AddProject<Projects.BlazorSpark_Web>("webfrontend")
     .WithReference(queues)
-    .WithExternalHttpEndpoints(); 
+    .WithExternalHttpEndpoints();
+
+builder.AddProject<Projects.BlazorUIContainer>("webcontainer")
+    .WithReference(queues)
+    .WithExternalHttpEndpoints();
 
 builder.Build().Run();

@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorSpark.ServiceDefaults
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorSpark.Web", "BlazorSpark.Web\BlazorSpark.Web.csproj", "{9C869122-F472-EA32-BB28-B51B2C7C1845}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorUIContainer", "BlazorUIContainer\BlazorUIContainer.csproj", "{2A72098F-9173-4092-B965-E7D9B17D50CA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +28,10 @@ Global
 		{9C869122-F472-EA32-BB28-B51B2C7C1845}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C869122-F472-EA32-BB28-B51B2C7C1845}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C869122-F472-EA32-BB28-B51B2C7C1845}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A72098F-9173-4092-B965-E7D9B17D50CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A72098F-9173-4092-B965-E7D9B17D50CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A72098F-9173-4092-B965-E7D9B17D50CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A72098F-9173-4092-B965-E7D9B17D50CA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

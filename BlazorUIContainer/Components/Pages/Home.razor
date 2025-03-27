@@ -1,0 +1,42 @@
+﻿@page "/"
+@using BlazorDatasheet
+@using BlazorDatasheet.Core
+@using BlazorDatasheet.Core.Data
+@inject QueueService QueueService
+
+<PageTitle>Home Container</PageTitle>
+
+<Datasheet Sheet="sheet" />
+<p><b>Queue message:</b> @QueueMessage</p>
+
+<button class="btn btn-primary" @onclick="WriteQueueService">Write To Queue</button>
+
+<button class="btn btn-primary" @onclick="PeekQueueService">Peek Queue</button>
+
+<button class="btn btn-primary" @onclick="ReadQueueService">Read Queue</button>
+@code {
+
+    private Sheet sheet;
+    private string QueueMessage = "";
+    private string QueueName = "available-queue";
+
+    protected override void OnInitialized()
+    {
+        sheet = new Sheet(10, 10);
+    }
+
+    private async Task PeekQueueService()
+    {
+        QueueMessage = await QueueService.PeekMessageAsync(QueueName);
+    }
+
+    private async Task ReadQueueService()
+    {
+        QueueMessage = await QueueService.ReadMessageAsync(QueueName);
+    }
+
+    private async Task WriteQueueService()
+    {
+        QueueMessage = await QueueService.SendMessageAsync(QueueName, $"Hello, Azure Queue! - {DateTime.Now}");
+    }
+}
