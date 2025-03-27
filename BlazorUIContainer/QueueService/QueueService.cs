@@ -45,6 +45,9 @@ public class QueueService
             // Get a reference to a queue
             var queueClient = _client.GetQueueClient(queueName);
 
+            // Ensure the queue exists
+            await queueClient.CreateIfNotExistsAsync();
+
             // Get messages from the queue
             var messages = await queueClient.ReceiveMessagesAsync();
 
@@ -68,24 +71,15 @@ public class QueueService
         }
     }
 
-    public async Task<string> SendMessageAsync(string queueName, string message)
+    public async Task SendMessageAsync(string queueName, string message)
     {
-        try
-        {
-            // Get a reference to a queue
-            var queueClient = _client.GetQueueClient(queueName);
+        // Get a reference to a queue
+        var queueClient = _client.GetQueueClient(queueName);
 
-            // Ensure the queue exists
-            await queueClient.CreateIfNotExistsAsync();
+        // Ensure the queue exists
+        await queueClient.CreateIfNotExistsAsync();
 
-            // Send a message to the queue
-            await queueClient.SendMessageAsync(message);
-
-            return "Success!";
-        }
-        catch (Exception ex)
-        {
-            return ex.Message;
-        }
+        // Send a message to the queue
+        await queueClient.SendMessageAsync(message);
     }
 }
