@@ -18,14 +18,9 @@ builder.AddProject<Projects.BlazorSpark_Web>("webfrontend")
        .WithExternalHttpEndpoints();
 
 // Add both UI‑container instances, referencing the same storage
-builder.AddProject<Projects.BlazorUIContainer>("webcontainer1")
+builder.AddProject<Projects.BlazorUIContainer>("webcontainer")
        .WithReference(storage)
        .WithReference(blobStorage)
-       .WithHttpsEndpoint(name: "webcontainer1-http", isProxied: true);
-
-builder.AddProject<Projects.BlazorUIContainer>("webcontainer2")
-       .WithReference(storage)
-       .WithReference(blobStorage)
-       .WithHttpsEndpoint(name: "webcontainer2-http", isProxied: true);
+       .WithHttpsEndpoint(name: "webcontainer-http", isProxied: true);
 
 builder.Build().Run();
