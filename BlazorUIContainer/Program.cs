@@ -15,16 +15,11 @@ namespace BlazorUIContainer
             // Add service defaults & Aspire client integrations.
             builder.AddServiceDefaults();
 
-            // Add Azure Queue & Blob clients.
-            builder.AddAzureQueueClient("queues");
+            // Add Azure Blob client
             builder.AddAzureBlobClient("blobs");
 
             // Create StorageService
             builder.Services.AddScoped<StorageService>();
-
-            // Add WorkState (singleton) and background polling
-            builder.Services.AddSingleton<WorkState>();
-            builder.Services.AddHostedService<QueuePollingService>();
 
             // Add services to the container.
             builder.Services.AddRazorComponents()

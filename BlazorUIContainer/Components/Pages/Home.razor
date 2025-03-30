@@ -5,17 +5,16 @@
 
 @inject NavigationManager NavigationManager
 @inject StorageService StorageService
-@inject WorkState WorkState
 
 <h3>Latest Queue Message</h3>
 
-@if (string.IsNullOrEmpty(WorkState.CurrentMessage))
+@if (!requestGuid.HasValue)
 {
     <p>No message received yet.</p>
 }
 else
 {
-    <p>@WorkState.CurrentMessage</p>
+    <p>@requestGuid.Value.ToString()</p>
 }
 
 @if (sheet is not null)
@@ -26,44 +25,25 @@ else
 @code {
     [Parameter]
     public Guid? requestGuid { get; set; }
-
+    private string CurrentGuid { get; set; }
     private const string BlobContainer = "current-container";
-    private const string AvailableQueueName = "available-queue";
     private Sheet sheet;
 
     protected override async Task OnInitializedAsync()
     {
-        var CurrentGuid = WorkState.CurrentMessage;
-
-        if (CurrentGuid != null)
+        if (requestGuid.HasValue)
         {
-            // Read existing blob (if needed)
+            // Set the current GUID
+            CurrentGuid = requestGuid.Value.ToString();
+
+            // Read existing blob
             var existing = await StorageService.ReadBlobAsync(BlobContainer, CurrentGuid);
 
             // Upload current URL as the “response”
             await StorageService.UploadBlobAsync(BlobContainer, CurrentGuid, NavigationManager.Uri);
 
-            // Notify queue that this GUID is now available
-            await StorageService.SendQueueMessageAsync(AvailableQueueName, CurrentGuid);
-        }
-    }
-
-    protected override void OnParametersSet()
-    {
-        if (!requestGuid.HasValue)
-            return;
-
-        var ParamGuidString = requestGuid.Value.ToString();
-
-        var CurrentGuid = WorkState.CurrentMessage;
-
-        if (CurrentGuid != null)
-        {
-            if (CurrentGuid == ParamGuidString)
-            {
-                LoadDataSheet();
-                return;
-            }
+            // Load the data sheet
+            LoadDataSheet();
         }
     }
 
