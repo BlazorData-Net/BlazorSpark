@@ -14,7 +14,7 @@ builder.Services.AddHttpClient<ContainerClient>(client =>
 {
     // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
     // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
-    client.BaseAddress = new("https://google.com/");
+    client.BaseAddress = new("https://localhost:7090/");
 });
 
 // Create StorageService
