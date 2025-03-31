@@ -66,7 +66,6 @@ namespace BlazorUIContainer
                 await next();
             });
 
-
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Error");
