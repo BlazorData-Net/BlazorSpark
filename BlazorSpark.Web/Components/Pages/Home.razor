@@ -3,13 +3,11 @@
 @using BlazorDatasheet.Core
 @using BlazorDatasheet.Core.Data
 @inject StorageService StorageService
-@inject ContainerClient ContainerApi
+@inject IConfiguration Configuration
 
 <PageTitle>Home</PageTitle>
 
 <p><b>WebContainerUrl: </b>@WebContainerUrl</p>
-<!-- Show https+http://webcontainer in an iframe -->
-@* <iframe src="@WebContainerUrl" width="100%" height="500"></iframe> *@
 <div style="flex-grow: 1; overflow: auto;">
     <iframe style="width: 100%; height: 90%;" src="@WebContainerUrl"></iframe>
 </div>
@@ -19,9 +17,9 @@
     private string CurrentGUID = "";
     private const string ContainerName = "current-container";
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        WebContainerUrl = ContainerApi.GetContainerUrl();
+        WebContainerUrl = Configuration["ContainerUrl"];
     }
 
     private async Task CreateRequest()

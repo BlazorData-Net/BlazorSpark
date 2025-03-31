@@ -10,12 +10,8 @@ builder.AddServiceDefaults();
 // Add Azure Blob client
 builder.AddAzureBlobClient("blobs");
 
-builder.Services.AddHttpClient<ContainerClient>(client =>
-{
-    // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
-    // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
-    client.BaseAddress = new("https://localhost:7090/");
-});
+// Get ContainerURL from Appsettings
+var containerUrl = builder.Configuration["ContainerUrl"];
 
 // Create StorageService
 builder.Services.AddScoped<StorageService>();
@@ -29,6 +25,9 @@ builder.Services.AddOutputCache();
 builder.Services.AddBlazorDatasheet();
 
 var app = builder.Build();
+
+// Set ContainerUrl
+app.Configuration["ContainerUrl"] = containerUrl;
 
 if (!app.Environment.IsDevelopment())
 {
