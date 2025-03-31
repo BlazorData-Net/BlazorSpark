@@ -8,40 +8,12 @@ using System.Linq;
 
 public class StorageService
 {
-    private readonly QueueServiceClient _queueClient;
     private readonly BlobServiceClient _blobClient;
 
-    public StorageService(QueueServiceClient queueClient, BlobServiceClient blobClient)
+    public StorageService( BlobServiceClient blobClient)
     {
-        _queueClient = queueClient;
         _blobClient = blobClient;
-    }
-
-    // ─────────── Queue Methods ───────────
-
-    public async Task<string> ReadQueueMessageAsync(string queueName)
-    {
-        var queue = _queueClient.GetQueueClient(queueName);
-        await queue.CreateIfNotExistsAsync();
-
-        var messages = await queue.ReceiveMessagesAsync();
-        var message = messages.Value.FirstOrDefault();
-
-        if (message is not null)
-        {
-            await queue.DeleteMessageAsync(message.MessageId, message.PopReceipt);
-            return message.MessageText;
-        }
-
-        return "null";
-    }
-
-    public async Task SendQueueMessageAsync(string queueName, string message)
-    {
-        var queue = _queueClient.GetQueueClient(queueName);
-        await queue.CreateIfNotExistsAsync();
-        await queue.SendMessageAsync(message);
-    }
+    }   
 
     // ─────────── Blob Methods ───────────
 

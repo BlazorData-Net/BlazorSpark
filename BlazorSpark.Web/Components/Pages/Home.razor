@@ -3,67 +3,33 @@
 @using BlazorDatasheet.Core
 @using BlazorDatasheet.Core.Data
 @inject StorageService StorageService
+@inject ContainerClient ContainerApi
 
 <PageTitle>Home</PageTitle>
 
-@if (!isRequestMade)
-{
-    <button class="btn btn-primary" @onclick="CreateRequest">Create Request</button>
-}
-else
-{
-    @if (isBusy)
-    {
-        <p>Request is being processed...</p>
-    }
-    else
-    {
-        <p>@($"Current GUID {CurrentGUID}")</p>
-    }
-}
+<p><b>WebContainerUrl: </b>@WebContainerUrl</p>
+<!-- Show https+http://webcontainer in an iframe -->
+@* <iframe src="@WebContainerUrl" width="100%" height="500"></iframe> *@
+<div style="flex-grow: 1; overflow: auto;">
+    <iframe style="width: 100%; height: 90%;" src="@WebContainerUrl"></iframe>
+</div>
 
 @code{
-
+    private string WebContainerUrl = "";
     private string CurrentGUID = "";
-    private bool isBusy = false;
-    private bool isRequestMade = false;
     private const string ContainerName = "current-container";
-    private const string RequestQueueName = "request-queue";
-    private const string AvailableQueueName = "available-queue";
+
+    protected override async Task OnInitializedAsync()
+    {
+        WebContainerUrl = ContainerApi.GetContainerUrl();
+    }
 
     private async Task CreateRequest()
     {
         // Create a new GUID for the request
-        var requestGuid = Guid.NewGuid();
+        CurrentGUID = Guid.NewGuid().ToString();
 
         // Write to Blob Storage
-        await StorageService.UploadBlobAsync(ContainerName, requestGuid.ToString(), requestGuid.ToString());
-
-        // Write to Queue Storage
-        await StorageService.SendQueueMessageAsync(RequestQueueName, requestGuid.ToString());
-
-        isRequestMade = true;
-        isBusy = true;
-
-        // Wait for the request to be processed
-        await PollForContainer();
-    }
-
-    private async Task PollForContainer()
-    {
-        while (isBusy)
-        {
-            var guid = await StorageService.ReadQueueMessageAsync(AvailableQueueName);
-
-            if (guid != "null")
-            {
-                CurrentGUID = guid;
-                isBusy = false;
-            }
-            else
-            {
-                await Task.Delay(1000);
-            }
-        }
+        await StorageService.UploadBlobAsync(ContainerName, CurrentGUID, $"Created on {DateTime.UtcNow}");
     }
 }

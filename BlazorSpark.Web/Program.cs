@@ -7,9 +7,15 @@ var builder = WebApplication.CreateBuilder(args);
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
 
-// Add Azure Queue & Blob clients.
-builder.AddAzureQueueClient("queues");
+// Add Azure Blob client
 builder.AddAzureBlobClient("blobs");
+
+builder.Services.AddHttpClient<ContainerClient>(client =>
+{
+    // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
+    // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
+    client.BaseAddress = new("https://google.com/");
+});
 
 // Create StorageService
 builder.Services.AddScoped<StorageService>();

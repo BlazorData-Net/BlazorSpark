@@ -14,12 +14,10 @@
 }
 else
 {
-    <p>@requestGuid.Value.ToString()</p>
-}
-
-@if (sheet is not null)
-{
-    <Datasheet Sheet="sheet" />
+    @if (sheet is not null)
+    {
+        <Datasheet Sheet="sheet" />
+    }
 }
 
 @code {
@@ -39,11 +37,14 @@ else
             // Read existing blob
             var existing = await StorageService.ReadBlobAsync(BlobContainer, CurrentGuid);
 
-            // Upload current URL as the “response”
-            await StorageService.UploadBlobAsync(BlobContainer, CurrentGuid, NavigationManager.Uri);
+            if (existing != null)
+            {
+                // Upload current URL as the “response”
+                await StorageService.UploadBlobAsync(BlobContainer, CurrentGuid, NavigationManager.Uri);
 
-            // Load the data sheet
-            LoadDataSheet();
+                // Load the data sheet
+                LoadDataSheet();
+            }
         }
     }
 
