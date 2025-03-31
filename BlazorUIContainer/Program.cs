@@ -3,6 +3,7 @@ using BlazorUIContainer.Components;
 using Azure.Storage.Queues;
 using Azure.Storage.Blobs;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Components.Server.Circuits;
 
 namespace BlazorUIContainer
 {
@@ -21,14 +22,12 @@ namespace BlazorUIContainer
             // Create StorageService
             builder.Services.AddScoped<StorageService>();
 
-            // Add CORS policy
-            //builder.Services.AddCors(options =>
-            //{
-            //    options.AddPolicy("AllowIFrameEmbedding", builder =>
-            //        builder.AllowAnyOrigin()
-            //               .AllowAnyHeader()
-            //               .AllowAnyMethod());
-            //});
+            // Add GUIDService
+            builder.Services.AddScoped<GUIDService>();
+
+            // Add a Custom CircuitHandler so we can
+            // remove the object from Azure Storage when the circuit is closed.
+            builder.Services.AddScoped<CircuitHandler, CustomCircuitHandler>();
 
             // Add services to the container.
             builder.Services.AddRazorComponents()
@@ -73,7 +72,6 @@ namespace BlazorUIContainer
             }
 
             app.UseHttpsRedirection();
-            //app.UseCors("AllowIFrameEmbedding"); // Use CORS policy
             app.UseAntiforgery();
             app.MapStaticAssets();
             app.MapRazorComponents<App>()

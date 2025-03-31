@@ -2,21 +2,27 @@
 @using BlazorDatasheet
 @using BlazorDatasheet.Core
 @using BlazorDatasheet.Core.Data
-
+@using System.Globalization
 @inject NavigationManager NavigationManager
 @inject StorageService StorageService
-
-<h3>Latest Queue Message</h3>
+@inject GUIDService GUIDService
 
 @if (!requestGuid.HasValue)
 {
-    <p>No message received yet.</p>
+    <p>No valid GUID was received.</p>
 }
 else
 {
-    @if (sheet is not null)
+    @if (isLoading)
     {
-        <Datasheet Sheet="sheet" />
+        @if (sheet is not null)
+        {
+            <Datasheet Sheet="sheet" />
+        }
+        else
+        {
+            <p>Loading...</p>
+        }
     }
 }
 
@@ -25,7 +31,13 @@ else
     public Guid? requestGuid { get; set; }
     private string CurrentGuid { get; set; }
     private const string BlobContainer = "current-container";
+
     private Sheet sheet;
+    private static readonly string[] Names = new[] 
+    { "Alice", "Bob", "Charlie", "Diana", "Eve", "Frank", "Grace", "Henry" };
+
+    private Random rand = new();
+    private bool isLoading = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -39,17 +51,42 @@ else
 
             if (existing != null)
             {
-                // Upload current URL as the “response”
+                isLoading = true;
+                StateHasChanged();
+
+                // Set the current GUID (BlobName) and Container in the GUID service
+                // to be used by the CustomCircuitHandler
+                // to remove the blob when the user navigates away
+                GUIDService.ContainerName = BlobContainer;
+                GUIDService.BlobName = CurrentGuid;
+
+                // Upload the object with the current URL as the “response”
                 await StorageService.UploadBlobAsync(BlobContainer, CurrentGuid, NavigationManager.Uri);
 
                 // Load the data sheet
-                LoadDataSheet();
+                await LoadDataSheet();
             }
         }
     }
 
-    private void LoadDataSheet()
-    {
-        sheet = new Sheet(3, 3);
+    private async Task LoadDataSheet()
+    {       
+        await Task.Run(() =>
+        {
+            // Create a new sheet with 1 million rows and 3 columns
+            sheet = new Sheet(1000000, 3);
+
+            for (int row = 0; row < 1000000; row++)
+            {
+                var name = Names[rand.Next(Names.Length)];
+                var number = rand.Next(1, 1001); // 1 to 1000
+                var date = DateTime.Now.AddDays(-rand.Next(0, 3650))
+                .ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+
+                sheet.Cells[row, 0].Value = name;
+                sheet.Cells[row, 1].Value = number;
+                sheet.Cells[row, 2].Value = date;
+            }
+        });
     }
 }
