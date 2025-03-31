@@ -1,0 +1,40 @@
+﻿@page "/onemillionlocal"
+@using BlazorDatasheet
+@using BlazorDatasheet.Core
+@using BlazorDatasheet.Core.Data
+@using System.Globalization
+
+<PageTitle>One Million Local</PageTitle>
+
+<h4>One Million Rows of Data (Local)</h4>
+
+<button class="btn btn-primary" @onclick="LoadDataSheet">Load Data</button>
+<br />
+<br />
+@if (sheet is not null)
+{
+    <Datasheet Sheet="sheet" />
+}
+
+@code {
+    private Sheet sheet;
+    private static readonly string[] Names = new[] { "Alice", "Bob", "Charlie", "Diana", "Eve", "Frank", "Grace", "Henry" };
+    private Random rand = new();
+
+    private void LoadDataSheet()
+    {
+        // Create a new sheet with 1 million rows and 3 columns
+        sheet = new Sheet(1000000, 3);
+
+        for (int row = 0; row < 1000000; row++)
+        {
+            var name = Names[rand.Next(Names.Length)];
+            var number = rand.Next(1, 1001); // 1 to 1000
+            var date = DateTime.Now.AddDays(-rand.Next(0, 3650)).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture); // Random date in the last 10 years
+
+            sheet.Cells[row, 0].Value = name;
+            sheet.Cells[row, 1].Value = number;
+            sheet.Cells[row, 2].Value = date;
+        }
+    }
+}
