@@ -33,7 +33,7 @@ else
     private const string BlobContainer = "current-container";
 
     private Sheet sheet;
-    private static readonly string[] Names = new[] 
+    private static readonly string[] Names = new[]
     { "Alice", "Bob", "Charlie", "Diana", "Eve", "Frank", "Grace", "Henry" };
 
     private Random rand = new();
@@ -41,51 +41,66 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        if (requestGuid.HasValue)
+        try
         {
-            // Set the current GUID
-            CurrentGuid = requestGuid.Value.ToString();
-
-            // Read existing blob
-            var existing = await StorageService.ReadBlobAsync(BlobContainer, CurrentGuid);
-
-            if (existing != null)
+            if (requestGuid.HasValue)
             {
-                isLoading = true;
-                StateHasChanged();
+                // Set the current GUID
+                CurrentGuid = requestGuid.Value.ToString();
 
-                // Set the current GUID (BlobName) and Container in the GUID service
-                // to be used by the CustomCircuitHandler
-                // to remove the blob when the user navigates away
-                GUIDService.ContainerName = BlobContainer;
-                GUIDService.BlobName = CurrentGuid;
+                // Read existing blob
+                var existing = await StorageService.ReadBlobAsync(BlobContainer, CurrentGuid);
 
-                // Upload the object with the current URL as the “response”
-                await StorageService.UploadBlobAsync(BlobContainer, CurrentGuid, NavigationManager.Uri);
+                if (existing != null)
+                {
+                    isLoading = true;
+                    StateHasChanged();
 
-                // Load the data sheet
-                await LoadDataSheet();
+                    // Set the current GUID (BlobName) and Container in the GUID service
+                    // to be used by the CustomCircuitHandler
+                    // to remove the blob when the user navigates away
+                    GUIDService.ContainerName = BlobContainer;
+                    GUIDService.BlobName = CurrentGuid;
+
+                    // Upload the object with the current URL as the “response”
+                    await StorageService.UploadBlobAsync(BlobContainer, CurrentGuid, NavigationManager.Uri);
+
+                    // Load the data sheet
+                    await LoadDataSheet();
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error initializing: {ex.Message}");
+            isLoading = false;
         }
     }
 
     private async Task LoadDataSheet()
-    {       
+    {
         await Task.Run(() =>
         {
-            // Create a new sheet with 1 million rows and 3 columns
-            sheet = new Sheet(1000000, 3);
-
-            for (int row = 0; row < 1000000; row++)
+            try
             {
-                var name = Names[rand.Next(Names.Length)];
-                var number = rand.Next(1, 1001); // 1 to 1000
-                var date = DateTime.Now.AddDays(-rand.Next(0, 3650))
-                .ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                // Create a new sheet with 1 million rows and 3 columns
+                sheet = new Sheet(1000000, 3);
 
-                sheet.Cells[row, 0].Value = name;
-                sheet.Cells[row, 1].Value = number;
-                sheet.Cells[row, 2].Value = date;
+                for (int row = 0; row < 1000000; row++)
+                {
+                    var name = Names[rand.Next(Names.Length)];
+                    var number = rand.Next(1, 1001); // 1 to 1000
+                    var date = DateTime.Now.AddDays(-rand.Next(0, 3650))
+                    .ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+
+                    sheet.Cells[row, 0].Value = name;
+                    sheet.Cells[row, 1].Value = number;
+                    sheet.Cells[row, 2].Value = date;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading data sheet: {ex.Message}");
             }
         });
     }

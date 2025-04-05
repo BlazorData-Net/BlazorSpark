@@ -36,7 +36,7 @@ namespace BlazorUIContainer
             builder.Services.AddBlazorDatasheet();
 
             var app = builder.Build();
-
+                                    
             // Configure the HTTP request pipeline
             // To allow this Container app to be iframed in another app
             app.Use(async (context, next) =>
@@ -44,22 +44,31 @@ namespace BlazorUIContainer
                 // How to display the app in an iframe
                 context.Response.OnStarting(() =>
                 {
-                    // Remove X-Frame-Options header
-                    context.Response.Headers.Remove("X-Frame-Options");
+                    try
+                    {
+                        // Remove X-Frame-Options header
+                        context.Response.Headers.Remove("X-Frame-Options");
 
-                    // Remove Content-Security-Policy header
-                    context.Response.Headers.Remove("Content-Security-Policy");
+                        // Remove Content-Security-Policy header
+                        context.Response.Headers.Remove("Content-Security-Policy");
 
-                    // Add custom CSP to allow iframing from anywhere
-                    context.Response.Headers.Append("Content-Security-Policy",
-                        "default-src 'self'; " +
-                        "script-src 'self'; " +
-                        "style-src 'self' 'unsafe-inline'; " +
-                        "img-src 'self' data:; " +
-                        "font-src 'self'; " +
-                        "frame-ancestors *;");
+                        // Add custom CSP to allow iframing from anywhere
+                        context.Response.Headers.Append("Content-Security-Policy",
+                            "default-src 'self'; " +
+                            "script-src 'self'; " +
+                            "style-src 'self' 'unsafe-inline'; " +
+                            "img-src 'self' data:; " +
+                            "font-src 'self'; " +
+                            "frame-ancestors *;");
 
-                    return Task.CompletedTask;
+                        return Task.CompletedTask;
+                    }
+                    catch (Exception ex)
+                    {
+                        // Handle any exceptions that occur during header modification
+                        Console.WriteLine($"Error modifying headers: {ex.Message}");
+                        return Task.CompletedTask;
+                    }
                 });
 
                 await next();

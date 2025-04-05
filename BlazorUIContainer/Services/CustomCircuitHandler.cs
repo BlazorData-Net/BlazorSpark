@@ -19,8 +19,17 @@ public class CustomCircuitHandler : CircuitHandler
     {
         try
         {
-            // Remove the object from Azure Storage.
-            await _storageService.DeleteBlobAsync(_gUIDService.ContainerName, _gUIDService.BlobName);
+            if(_gUIDService.BlobName != null && _gUIDService.ContainerName != null)
+            {
+                // Read the blob to see if it exists
+                var blob = await _storageService.ReadBlobAsync(_gUIDService.ContainerName, _gUIDService.BlobName);
+                
+                if (blob != null)
+                {
+                    // Remove the object from Azure Storage.
+                    await _storageService.DeleteBlobAsync(_gUIDService.ContainerName, _gUIDService.BlobName);
+                }
+            }
         }
         catch 
         {
