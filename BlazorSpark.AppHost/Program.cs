@@ -17,8 +17,6 @@ var webContainer = builder.AddProject<Projects.BlazorUIContainer>("webcontainer"
 // Add the web frontend — reference the same storage for both queue and blob access
 builder.AddProject<Projects.BlazorSpark_Web>("webfrontend")
        .WithReference(blobStorage)
-       .WithReference(webContainer)
-       .WaitFor(webContainer)
        .WithExternalHttpEndpoints();
 
 builder.Build().Run();
