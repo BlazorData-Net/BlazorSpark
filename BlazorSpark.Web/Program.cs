@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 // Add Azure Blob client
-builder.AddAzureBlobClient("blobs");
+builder.AddAzureBlobServiceClient("blobs");
 
 // Get ContainerURL from Appsettings
 var containerUrl = builder.Configuration["ContainerUrl"];

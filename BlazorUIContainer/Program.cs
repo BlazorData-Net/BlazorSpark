@@ -17,7 +17,7 @@ namespace BlazorUIContainer
             builder.AddServiceDefaults();
 
             // Add Azure Blob client
-            builder.AddAzureBlobClient("blobs");
+            builder.AddAzureBlobServiceClient("blobs");
 
             // Create StorageService
             builder.Services.AddScoped<StorageService>();

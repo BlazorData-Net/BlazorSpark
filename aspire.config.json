@@ -1,0 +1,5 @@
+{
+  "appHost": {
+    "path": "BlazorSpark.AppHost/BlazorSpark.AppHost.csproj"
+  }
+}
